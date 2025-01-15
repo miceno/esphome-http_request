@@ -16,6 +16,10 @@ The ``http_request`` component lets you make HTTP/HTTPS requests. To do so, you 
 
 .. _http_request-configuration_variables:
 
+Changelog
+---------
+
+This version deals with HTTP servers that do not send the `Content-Length` header.
 
 Configuration variables:
 ------------------------
