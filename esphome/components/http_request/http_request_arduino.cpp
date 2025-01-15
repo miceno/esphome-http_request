@@ -23,6 +23,7 @@ std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::s
   }
 
   std::shared_ptr<HttpContainerArduino> container = std::make_shared<HttpContainerArduino>();
+  ESP_LOGW(TAG, "readBytes=%d", container->get_bytes_read());
   container->set_parent(this);
 
   const uint32_t start = millis();
