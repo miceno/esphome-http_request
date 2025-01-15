@@ -23,7 +23,6 @@ std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::s
   }
 
   std::shared_ptr<HttpContainerArduino> container = std::make_shared<HttpContainerArduino>();
-  ESP_LOGW(TAG, "readBytes=%d", container->get_bytes_read());
   container->set_parent(this);
 
   const uint32_t start = millis();
@@ -150,8 +149,6 @@ int HttpContainerArduino::read(uint8_t *buf, size_t max_len) {
 
   App.feed_wdt();
   int read_len = stream_ptr->readBytes(buf, bufsize);
-  ESP_LOGD(TAG, "readLen=%d", read_len);
-  ESP_LOGD(TAG, "bytesRead=%d", this->bytes_read_);
   this->bytes_read_ += read_len;
 
   this->duration_ms += (millis() - start);
