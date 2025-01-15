@@ -150,6 +150,8 @@ int HttpContainerArduino::read(uint8_t *buf, size_t max_len) {
 
   App.feed_wdt();
   int read_len = stream_ptr->readBytes(buf, bufsize);
+  ESP_LOGD(TAG, "readLen=%d", read_len);
+  ESP_LOGD(TAG, "bytesRead=%d", this->bytes_read_);
   this->bytes_read_ += read_len;
 
   this->duration_ms += (millis() - start);
