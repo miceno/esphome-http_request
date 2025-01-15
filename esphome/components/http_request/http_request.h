@@ -211,6 +211,10 @@ template<typename... Ts> class HttpRequestSendAction : public Action<Ts...> {
 		  ESP_LOGW("http_request_new", "readindex=%d", read_index);
           int read = container->read(buf + read_index, std::min<size_t>(max_length - read_index, 512));
 		  ESP_LOGW("http_request_new", "read=%d", read);
+          if (read < 0){
+			  ESP_LOGW("http_request_new", "Exit loop");
+			  break;
+          }
           App.feed_wdt();
           yield();
           read_index += read;
