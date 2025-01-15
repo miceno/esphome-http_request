@@ -194,9 +194,10 @@ template<typename... Ts> class HttpRequestSendAction : public Action<Ts...> {
     }
 
     size_t content_length = container->content_length;
+    site_t max_response_buffer = this->max_response_buffer_size_;
     size_t max_length = std::min(content_length, this->max_response_buffer_size_);
 
-    ESP_LOGW("http_request_new", "contLen=%d, maxLen=%d", content_length, max_length);
+    ESP_LOGW("http_request_new", "contLen=%d, maxBuffer=%d, maxLen=%d", content_length, max_response_buffer, max_length);
     std::string response_body;
     if (this->capture_response_.value(x...)) {
 
@@ -205,12 +206,13 @@ template<typename... Ts> class HttpRequestSendAction : public Action<Ts...> {
       uint8_t *buf = allocator.allocate(max_length);
       if (buf != nullptr) {
         size_t read_index = 0;
-		ESP_LOGW("http_request_new", "get_bytes_read=%d");
 		size_t bytes_read = container->get_bytes_read();
-        while (bytes_read < max_length) {
+        while (container->get_bytes_read() < max_length) {
+  		  ESP_LOGW("http_request_new", "get_bytes_read=%d", bytes_read);
 		  ESP_LOGW("http_request_new", "readindex=%d", read_index);
           int read = container->read(buf + read_index, std::min<size_t>(max_length - read_index, 512));
 		  ESP_LOGW("http_request_new", "read=%d", read);
+		  ESP_LOGW("http_request_new", "get_bytes_read=%d", bytes_read);
           if (read < 0){
 			  ESP_LOGW("http_request_new", "Exit loop");
 			  break;
