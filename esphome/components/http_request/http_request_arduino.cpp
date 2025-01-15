@@ -122,7 +122,7 @@ std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::s
   }
 
   int content_length = container->client_.getSize();
-  ESP_LOGD(TAG, "Content-Length: %d", content_length);
+  ESP_LOGD(TAG, "New Content-Length: %d", content_length);
   container->content_length = (size_t) content_length;
   container->duration_ms = millis() - start;
 
