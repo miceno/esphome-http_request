@@ -194,7 +194,7 @@ template<typename... Ts> class HttpRequestSendAction : public Action<Ts...> {
     }
 
     size_t content_length = container->content_length;
-    site_t max_response_buffer = this->max_response_buffer_size_;
+    size_t max_response_buffer = this->max_response_buffer_size_;
     size_t max_length = std::min(content_length, this->max_response_buffer_size_);
 
     ESP_LOGW("http_request_new", "contLen=%d, maxBuffer=%d, maxLen=%d", content_length, max_response_buffer, max_length);
