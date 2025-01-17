@@ -16,13 +16,10 @@ The ``http_request`` component lets you make HTTP/HTTPS requests. To do so, you 
 
 .. _http_request-configuration_variables:
 
-Development patch
-------
+Changelog
+---------
 
-The project must override the underlying `ESP86HttpRequest` library, and use another version, so you can debug using this fine tuned library.
-
-In order to acomplish it, use the `libraries` option on the `esphome` object, see
-(here)[https://esphome.io/components/esphome.html#libraries].
+This version deals with HTTP servers that do not send the `Content-Length` header.
 
 Configuration variables:
 ------------------------
