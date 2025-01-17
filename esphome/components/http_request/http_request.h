@@ -197,23 +197,23 @@ template<typename... Ts> class HttpRequestSendAction : public Action<Ts...> {
     size_t max_response_buffer = this->max_response_buffer_size_;
     size_t max_length = std::min(content_length, this->max_response_buffer_size_);
 
-    // ESP_LOGW("http_request_new", "contLen=%d, maxBuffer=%d, maxLen=%d", content_length, max_response_buffer, max_length);
+    // ESP_LOGW("http_request_async", "contLen=%d, maxBuffer=%d, maxLen=%d", content_length, max_response_buffer, max_length);
     std::string response_body;
     if (this->capture_response_.value(x...)) {
 
-	  // ESP_LOGW("http_request_new", "memalloc");
+	  // ESP_LOGW("http_request_async", "memalloc");
       ExternalRAMAllocator<uint8_t> allocator(ExternalRAMAllocator<uint8_t>::ALLOW_FAILURE);
       uint8_t *buf = allocator.allocate(max_length);
       if (buf != nullptr) {
         size_t read_index = 0;
         while (container->get_bytes_read() < max_length) {
-  		  // ESP_LOGW("http_request_new", "get_bytes_read=%d", container->get_bytes_read());
-		  // ESP_LOGW("http_request_new", "readindex=%d", read_index);
+  		  // ESP_LOGW("http_request_async", "get_bytes_read=%d", container->get_bytes_read());
+		  // ESP_LOGW("http_request_async", "readindex=%d", read_index);
           int read = container->read(buf + read_index, std::min<size_t>(max_length - read_index, 512));
-		  // ESP_LOGW("http_request_new", "read=%d", read);
-		  // ESP_LOGW("http_request_new", "get_bytes_read=%d", bytes_read);
+		  // ESP_LOGW("http_request_async", "read=%d", read);
+		  // ESP_LOGW("http_request_async", "get_bytes_read=%d", bytes_read);
           if (read < 0){
-			  ESP_LOGD("http_request_new", "Exit loop");
+			  ESP_LOGD("http_request_async", "Exit loop");
 			  break;
           }
           App.feed_wdt();

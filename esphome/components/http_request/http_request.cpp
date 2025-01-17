@@ -7,10 +7,10 @@
 namespace esphome {
 namespace http_request {
 
-static const char *const TAG = "http_request_new";
+static const char *const TAG = "http_request_async";
 
 void HttpRequestComponent::dump_config() {
-  ESP_LOGCONFIG(TAG, "HTTP Request new:");
+  ESP_LOGCONFIG(TAG, "HTTP Request Async:");
   ESP_LOGCONFIG(TAG, "  Timeout: %ums", this->timeout_);
   ESP_LOGCONFIG(TAG, "  User-Agent: %s", this->useragent_);
   ESP_LOGCONFIG(TAG, "  Follow redirects: %s", YESNO(this->follow_redirects_));
