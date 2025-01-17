@@ -21,6 +21,8 @@ Changelog
 
 This version deals with HTTP servers that do not send the `Content-Length` header.
 
+In addition, it supports async requests using `AsyncHTTPRequest_Generic <https://github.com/khoih-prog/AsyncHTTPRequest_Generic>` library.
+
 Configuration variables:
 ------------------------
 
