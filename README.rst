@@ -1,20 +1,20 @@
-HTTP Request
+Async HTTP Request
 ============
 
 .. seo::
-    :description: Instructions for setting up HTTP Requests in ESPHome
+    :description: Instructions for setting up Async HTTP Requests in ESPHome
     :image: connection.svg
-    :keywords: http, request
+    :keywords: http, request, async
 
 
-The ``http_request`` component lets you make HTTP/HTTPS requests. To do so, you need to add it to your device's configuration:
+The ``http_request_async`` component lets you make HTTP/HTTPS requests. To do so, you need to add it to your device's configuration:
 
 .. code-block:: yaml
 
     # Example configuration entry
-    http_request:
+    http_request_async:
 
-.. _http_request-configuration_variables:
+.. _http_request_async-configuration_variables:
 
 Changelog
 ---------
@@ -75,11 +75,11 @@ Configuration variables:
 HTTP Request Actions
 --------------------
 
-The ``http_request`` component supports a number of :ref:`actions <config-action>` that can be used to send requests.
+The ``http_request_async`` component supports a number of :ref:`actions <config-action>` that can be used to send requests.
 
-.. _http_request-get_action:
+.. _http_request_async-get_action:
 
-``http_request.get`` Action
+``http_request_async.get`` Action
 ***************************
 
 This :ref:`action <config-action>` sends a GET request.
@@ -87,7 +87,7 @@ This :ref:`action <config-action>` sends a GET request.
 .. code-block:: yaml
 
     on_...:
-      - http_request.get:
+      - http_request_async.get:
           url: https://esphome.io
           headers:
             Content-Type: application/json
@@ -99,7 +99,7 @@ This :ref:`action <config-action>` sends a GET request.
                     - response->status_code
                     - response->duration_ms
       # Short form
-      - http_request.get: https://esphome.io
+      - http_request_async.get: https://esphome.io
 
 **Configuration variables:**
 
@@ -112,9 +112,9 @@ This :ref:`action <config-action>` sends a GET request.
 - **on_response** (*Optional*, :ref:`Automation <automation>`): An automation to perform after the request is received.
 - **on_error** (*Optional*, :ref:`Automation <automation>`): An automation to perform if the request cannot be completed.
 
-.. _http_request-post_action:
+.. _http_request_async-post_action:
 
-``http_request.post`` Action
+``http_request_async.post`` Action
 ****************************
 
 This :ref:`action <config-action>` sends a POST request.
@@ -122,25 +122,25 @@ This :ref:`action <config-action>` sends a POST request.
 .. code-block:: yaml
 
     on_...:
-      - http_request.post:
+      - http_request_async.post:
           url: https://esphome.io
           headers:
             Content-Type: application/json
           json:
             key: value
       # Short form
-      - http_request.post: https://esphome.io
+      - http_request_async.post: https://esphome.io
 
 **Configuration variables:**
 
 - **body** (*Optional*, string, :ref:`templatable <config-templatable>`): A HTTP body string to send with request.
 - **json** (*Optional*, mapping): A HTTP body in JSON format. Values are :ref:`templatable <config-templatable>`.
-  See :ref:`http_request-examples`.
-- All other options from :ref:`http_request-get_action`.
+  See :ref:`http_request_async-examples`.
+- All other options from :ref:`http_request_async-get_action`.
 
-.. _http_request-send_action:
+.. _http_request_async-send_action:
 
-``http_request.send`` Action
+``_http_request_async.send`` Action
 ****************************
 
 This :ref:`action <config-action>` sends a request.
@@ -148,7 +148,7 @@ This :ref:`action <config-action>` sends a request.
 .. code-block:: yaml
 
     on_...:
-      - http_request.send:
+      - http_request_async.send:
           method: PUT
           url: https://esphome.io
           headers:
@@ -158,9 +158,9 @@ This :ref:`action <config-action>` sends a request.
 **Configuration variables:**
 
 - **method** (**Required**, string): HTTP method to use (``GET``, ``POST``, ``PUT``, ``DELETE``, ``PATCH``).
-- All other options from :ref:`http_request-post_action` and :ref:`http_request-get_action`.
+- All other options from :ref:`http_request_async-post_action` and :ref:`http_request_async-get_action`.
 
-.. _http_request-on_response:
+.. _http_request_async-on_response:
 
 ``on_response`` Trigger
 -----------------------
@@ -170,7 +170,7 @@ The following variables are available for use in :ref:`lambdas <config-lambda>`:
 
 - ``response`` as a pointer to ``HttpContainer`` object which contains ``content_length``, ``status_code`` and ``duration_ms``.
 - ``body`` as ``std::string`` which contains the response body when ``capture_response``
-  (see :ref:`http_request-get_action`) is set to ``true``.
+  (see :ref:`http_request_async-get_action`) is set to ``true``.
 
     .. note::
 
@@ -181,7 +181,7 @@ The following variables are available for use in :ref:`lambdas <config-lambda>`:
 
     on_...
       then:
-        - http_request.get:
+        - http_request_async.get:
             url: https://esphome.io
             on_response:
               then:
@@ -197,7 +197,7 @@ The following variables are available for use in :ref:`lambdas <config-lambda>`:
                 - logger.log: "Request failed!"
 
 
-.. _http_request-on_error:
+.. _http_request_async-on_error:
 
 ``on_error`` Trigger
 -----------------------
@@ -208,7 +208,7 @@ completes, even if the response code is not 200. No information on the type of e
 are available for use in :ref:`lambdas <config-lambda>`. See example usage above.
 
 
-.. _http_request-examples:
+.. _http_request_async-examples:
 
 Examples
 --------
@@ -219,7 +219,7 @@ Templatable values
 .. code-block:: yaml
 
     on_...:
-      - http_request.post:
+      - http_request_async.post:
           url: !lambda |-
             return ((std::string) "https://esphome.io?state=" + id(my_sensor).state).c_str();
           headers:
@@ -238,7 +238,7 @@ syntax.
 .. code-block:: yaml
 
     on_...:
-      - http_request.post:
+      - http_request_async.post:
           url: https://esphome.io
           json:
             key: !lambda |-
@@ -260,7 +260,7 @@ can assign values to keys by using the ``root["KEY_NAME"] = VALUE;`` syntax as s
 .. code-block:: yaml
 
     on_...:
-      - http_request.post:
+      - http_request_async.post:
           url: https://esphome.io
           json: |-
             root["key"] = id(my_sensor).state;
@@ -285,7 +285,7 @@ whose ``id`` is  set to ``player_volume``:
 .. code-block:: yaml
 
     on_...:
-    - http_request.get:
+    - http_request_async.get:
         url: https://esphome.io
         capture_response: true
         on_response:
@@ -314,6 +314,6 @@ See Also
 --------
 
 - :doc:`index`
-- :apiref:`http_request/http_request.h`
+- :apiref:`http_request_async/http_request.h`
 - :doc:`/components/json`
 - :ghedit:`Edit`
