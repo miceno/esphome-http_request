@@ -17,7 +17,7 @@ from esphome.core import CORE, Lambda
 DEPENDENCIES = ["network"]
 AUTO_LOAD = ["json", "watchdog"]
 
-http_request_ns = cg.esphome_ns.namespace("http_request")
+http_request_ns = cg.esphome_ns.namespace("http_request_async")
 HttpRequestComponent = http_request_ns.class_("HttpRequestComponent", cg.Component)
 HttpRequestArduino = http_request_ns.class_("HttpRequestArduino", HttpRequestComponent)
 HttpRequestIDF = http_request_ns.class_("HttpRequestIDF", HttpRequestComponent)
@@ -34,7 +34,7 @@ HttpRequestResponseTrigger = http_request_ns.class_(
     ),
 )
 
-CONF_HTTP_REQUEST_ID = "http_request_id"
+CONF_HTTP_REQUEST_ID = "http_request_async_id"
 
 CONF_USERAGENT = "useragent"
 CONF_VERIFY_SSL = "verify_ssl"
@@ -232,13 +232,13 @@ HTTP_REQUEST_SEND_ACTION_SCHEMA = HTTP_REQUEST_ACTION_SCHEMA.extend(
 
 
 @automation.register_action(
-    "http_request.get", HttpRequestSendAction, HTTP_REQUEST_GET_ACTION_SCHEMA
+    "http_request_async.get", HttpRequestSendAction, HTTP_REQUEST_GET_ACTION_SCHEMA
 )
 @automation.register_action(
-    "http_request.post", HttpRequestSendAction, HTTP_REQUEST_POST_ACTION_SCHEMA
+    "http_request_async.post", HttpRequestSendAction, HTTP_REQUEST_POST_ACTION_SCHEMA
 )
 @automation.register_action(
-    "http_request.send", HttpRequestSendAction, HTTP_REQUEST_SEND_ACTION_SCHEMA
+    "http_request_async.send", HttpRequestSendAction, HTTP_REQUEST_SEND_ACTION_SCHEMA
 )
 async def http_request_action_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
