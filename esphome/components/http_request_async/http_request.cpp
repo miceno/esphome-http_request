@@ -5,7 +5,7 @@
 #include <cinttypes>
 
 namespace esphome {
-namespace http_request {
+namespace http_request_async {
 
 static const char *const TAG = "http_request_async";
 

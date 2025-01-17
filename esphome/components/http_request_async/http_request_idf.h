@@ -10,7 +10,7 @@
 #include <esp_tls.h>
 
 namespace esphome {
-namespace http_request {
+namespace http_request_async {
 
 class HttpContainerIDF : public HttpContainer {
  public:

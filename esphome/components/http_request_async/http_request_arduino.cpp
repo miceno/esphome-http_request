@@ -10,9 +10,9 @@
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace http_request {
+namespace http_request_async {
 
-static const char *const TAG = "http_request.arduino";
+static const char *const TAG = "http_request_async.arduino";
 
 std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::string method, std::string body,
                                                          std::list<Header> headers) {

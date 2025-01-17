@@ -15,7 +15,7 @@
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace http_request {
+namespace http_request_async {
 
 struct Header {
   const char *name;

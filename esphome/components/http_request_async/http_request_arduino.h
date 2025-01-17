@@ -15,7 +15,7 @@
 #endif
 
 namespace esphome {
-namespace http_request {
+namespace http_request_async {
 
 class HttpRequestArduino;
 class HttpContainerArduino : public HttpContainer {
