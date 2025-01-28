@@ -1,4 +1,5 @@
 #include "http_request_arduino.h"
+#include <AsyncHTTPRequest_Generic.h>
 
 #ifdef USE_ARDUINO
 
@@ -160,6 +161,93 @@ void HttpContainerArduino::end() {
   watchdog::WatchdogManager wdm(this->parent_->get_watchdog_timeout());
   this->client_.end();
 }
+
+//
+//
+//
+// new async http container
+//
+//
+//
+
+
+/*
+  Set body data and flags.
+*/
+void AsyncHttpContainer::setAvailableData(const char *body) {
+  _response_body = body;
+  _isDataAvailable = true;
+  _isRequestSent = true;
+
+  if (_responseCallback) {
+    _responseCallback(_responseCallbackArg, this, body);
+  }
+}
+
+void AsyncHttpContainer::setAvailableData(const string &body) {
+  setAvailableData(body.c_str());
+}
+
+/*
+  Override this member to add your custom headers to the request.
+*/
+void AsyncHttpContainer::setRequestDefaultHeaders() {
+}
+
+void _handleRequestState(void* optParm, AsyncHTTPRequest* request, int readyState) {
+  AsyncHttpContainer* httpContainer = (AsyncHttpContainer*)optParm;
+
+  httpContainer->dataNotAvailable();
+  ESP_LOGV(TAG, F("API State received=%d, request=%d"), readyState, request->readyState());
+
+  if (readyState == readyStateDone) {
+    ESP_LOGV(TAG, F("API Response Code = |%s|"), request->responseHTTPString().c_str());
+    int responseCode = 0;
+    httpContainer->requestNotSent();
+    responseCode = httpContainer->get_response_code();
+    if (responseCode > 0) {
+      // TODO: Allow processing of response headers
+      httpContainer->setAvailableData(request->responseText().c_str());
+
+      ESP_LOGV(TAG, "HTTP response: %d\n**************************************", responseCode);
+      ESP_LOGV(TAG, httpContainer->get_response_body());
+      ESP_LOGV(TAG, "**************************************");
+
+    } else {
+      httpContainer->set_response_body("");
+      ESP_LOGE(TAG, F("HTTP error: %d"), responseCode);
+      httpContainer->raise_error();
+    }
+  }
+}
+
+
+bool AsyncHttpContainer::start() {
+  ESP_LOGV(TAG, "* %s %s, %s", _method.c_str(), _url.c_str(), _request_body.c_str());
+
+  _isRequestSent = false;
+  _isDataAvailable = false;
+  _response_body.clear();
+  _request.onReadyStateChange(_handleRequestState, (void*)this);
+  _request.setDebug(true);
+
+  bool requestOpenResult = false;
+  requestOpenResult = _request.open(_method.c_str(), _url.c_str());
+  setRequestDefaultHeaders();
+
+  if (requestOpenResult) {
+    // Send request and terminate, the callback will get the response.
+    _isRequestSent = _request.send(_request_body.c_str());
+  } else {
+    ESP_LOGE(TAG, "Can't send bad request");
+    raise_error();
+  }
+  return requestOpenResult && _isRequestSent;
+}
+
+
+
+
 
 }  // namespace http_request
 }  // namespace esphome
