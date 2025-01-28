@@ -166,7 +166,7 @@ async def to_code(config):
             cg.add_library("HTTPClient", None)
     if CORE.is_esp8266:
         # cg.add_library("ESP8266HTTPClient", None)
-        # cg.add_library("AsyncHTTPRequest_Generic", None)
+        cg.add_library("AsyncHTTPRequest_Generic", None)
     if CORE.is_rp2040 and CORE.using_arduino:
         cg.add_library("HTTPClient", None)
 
