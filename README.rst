@@ -180,7 +180,7 @@ This :ref:`action <config-action>` sends a request.
 This automation will be triggered when the HTTP request is complete.
 The following variables are available for use in :ref:`lambdas <config-lambda>`:
 
-- ``response`` as a pointer to ``HttpContainer`` object which contains `content_length``, ``status_code`` and ``duration_ms``.
+- ``response`` as a pointer to ``HttpContainer`` object which contains ``content_length``, ``status_code`` and ``duration_ms``.
 - ``std::string get_response_header(const std::string &header_name)`` to read response headers (only headers with names specified in the ``collect_headers`` are available).
 - ``body`` as ``std::string`` which contains the response body when ``capture_response``
   (see :ref:`http_request-get_action`) is set to ``true``.
