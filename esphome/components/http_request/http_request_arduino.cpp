@@ -14,8 +14,9 @@ namespace http_request {
 
 static const char *const TAG = "http_request.arduino";
 
-std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::string method, std::string body,
-                                                         std::list<Header> headers) {
+std::shared_ptr<HttpContainer> HttpRequestArduino::perform(std::string url, std::string method, std::string body,
+                                                           std::list<Header> request_headers,
+                                                           std::set<std::string> collect_headers) {
   if (!network::is_connected()) {
     this->status_momentary_error("failed", 1000);
     ESP_LOGW(TAG, "HTTP Request failed; Not connected to network");
@@ -95,14 +96,17 @@ std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::s
   if (this->useragent_ != nullptr) {
     container->client_.setUserAgent(this->useragent_);
   }
-  for (const auto &header : headers) {
-    container->client_.addHeader(header.name, header.value, false, true);
+  for (const auto &header : request_headers) {
+    container->client_.addHeader(header.name.c_str(), header.value.c_str(), false, true);
   }
 
   // returned needed headers must be collected before the requests
-  static const char *header_keys[] = {"Content-Length", "Content-Type"};
-  static const size_t HEADER_COUNT = sizeof(header_keys) / sizeof(header_keys[0]);
-  container->client_.collectHeaders(header_keys, HEADER_COUNT);
+  const char *header_keys[collect_headers.size()];
+  int index = 0;
+  for (auto const &header_name : collect_headers) {
+    header_keys[index++] = header_name.c_str();
+  }
+  container->client_.collectHeaders(header_keys, index);
 
   App.feed_wdt();
   container->status_code = container->client_.sendRequest(method.c_str(), body.c_str());
@@ -121,8 +125,19 @@ std::shared_ptr<HttpContainer> HttpRequestArduino::start(std::string url, std::s
     // Still return the container, so it can be used to get the status code and error message
   }
 
+  container->response_headers_ = {};
+  auto header_count = container->client_.headers();
+  for (int i = 0; i < header_count; i++) {
+    const std::string header_name = str_lower_case(container->client_.headerName(i).c_str());
+    if (collect_headers.count(header_name) > 0) {
+      std::string header_value = container->client_.header(i).c_str();
+      ESP_LOGD(TAG, "Received response header, name: %s, value: %s", header_name.c_str(), header_value.c_str());
+      container->response_headers_[header_name].push_back(header_value);
+    }
+  }
+
   int content_length = container->client_.getSize();
-  ESP_LOGD(TAG, "New Content-Length: %d", content_length);
+  ESP_LOGD(TAG, "Content-Length: %d", content_length);
   container->content_length = (size_t) content_length;
   container->duration_ms = millis() - start;
 
