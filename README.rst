@@ -16,13 +16,10 @@ The ``http_request`` component lets you make HTTP/HTTPS requests. To do so, you 
 
 .. _http_request-configuration_variables:
 
-Development patch
-------
+Changelog
+---------
 
-The project must override the underlying `ESP86HttpRequest` library, and use another version, so you can debug using this fine tuned library.
-
-In order to acomplish it, use the `libraries` option on the `esphome` object, see
-(here)[https://esphome.io/components/esphome.html#libraries].
+This version deals with HTTP servers that do not send the `Content-Length` header.
 
 Configuration variables:
 ------------------------
@@ -75,6 +72,17 @@ Configuration variables:
 
     **We strongly recommend using hardware which properly supports TLS/SSL.**
 
+**For the host platform:**
+
+ - **ca_certificate_path** (*Optional*, file path): Path to a CA certificate bundle. Not required on MacOS (the inbuilt CA bundle is used and SSL enabled by default).
+   On Linux this is required to enable SSL.
+
+    .. note::
+
+        To use SSL on Linux you must have the ``libssl-dev`` package installed (e.g. ``sudo apt install libssl-dev``).
+        A typical value on Linux for ``ca_certificate_path`` would be ``/etc/ssl/certs/ca-certificates.crt``.
+
+
 HTTP Request Actions
 --------------------
 
@@ -92,7 +100,7 @@ This :ref:`action <config-action>` sends a GET request.
     on_...:
       - http_request.get:
           url: https://esphome.io
-          headers:
+          request_headers:
             Content-Type: application/json
           on_response:
             then:
@@ -107,7 +115,8 @@ This :ref:`action <config-action>` sends a GET request.
 **Configuration variables:**
 
 - **url** (**Required**, string, :ref:`templatable <config-templatable>`): URL to which to send the request.
-- **headers** (*Optional*, mapping): Map of HTTP headers. Values are :ref:`templatable <config-templatable>`.
+- **request_headers** (*Optional*, mapping): Map of HTTP headers. Values are :ref:`templatable <config-templatable>`.
+- **collect_headers** (*Optional*, list of strings): List of the names of HTTP headers to collect from the response.
 - **capture_response** (*Optional*, boolean): when set to ``true``, the response data will be captured and placed into
   the ``body`` variable as a ``std::string`` for use in :ref:`lambdas <config-lambda>`. Defaults to ``false``.
 - **max_response_buffer_size** (*Optional*, integer): The maximum buffer size to be used to store the response.
@@ -127,7 +136,7 @@ This :ref:`action <config-action>` sends a POST request.
     on_...:
       - http_request.post:
           url: https://esphome.io
-          headers:
+          request_headers:
             Content-Type: application/json
           json:
             key: value
@@ -154,7 +163,7 @@ This :ref:`action <config-action>` sends a request.
       - http_request.send:
           method: PUT
           url: https://esphome.io
-          headers:
+          request_headers:
             Content-Type: application/json
           body: "Some data"
 
@@ -172,6 +181,7 @@ This automation will be triggered when the HTTP request is complete.
 The following variables are available for use in :ref:`lambdas <config-lambda>`:
 
 - ``response`` as a pointer to ``HttpContainer`` object which contains ``content_length``, ``status_code`` and ``duration_ms``.
+- ``std::string get_response_header(const std::string &header_name)`` to read response headers (only headers with names specified in the ``collect_headers`` are available).
 - ``body`` as ``std::string`` which contains the response body when ``capture_response``
   (see :ref:`http_request-get_action`) is set to ``true``.
 
@@ -186,15 +196,18 @@ The following variables are available for use in :ref:`lambdas <config-lambda>`:
       then:
         - http_request.get:
             url: https://esphome.io
+            collect_headers:
+              - Content-Type
             on_response:
               then:
                 - logger.log:
-                    format: "Response status: %d, Duration: %u ms"
+                    format: "Response status: %d, Duration: %u ms, Content-Type: %s"
                     args:
                       - response->status_code
                       - response->duration_ms
+                      - response->get_response_header("Content-Type").c_str()
                 - lambda: |-
-                    ESP_LOGD(TAG, "Response status: %d, Duration: %u ms", response->status_code, response->duration_ms);
+                    ESP_LOGD(TAG, "Response status: %d, Duration: %u ms, Content-Type: %s", response->status_code, response->duration_ms, response->get_response_header("Content-Type").c_str());
             on_error:
               then:
                 - logger.log: "Request failed!"
@@ -225,7 +238,7 @@ Templatable values
       - http_request.post:
           url: !lambda |-
             return ((std::string) "https://esphome.io?state=" + id(my_sensor).state).c_str();
-          headers:
+          request_headers:
             X-Custom-Header: !lambda |-
               return ((std::string) "Value-" + id(my_sensor).state).c_str();
           body: !lambda |-
